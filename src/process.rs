@@ -1,7 +1,9 @@
 use csv::Reader;
 use serde_json::Value;
 
-pub fn process_csv(input: &str, output: &str) -> anyhow::Result<()> {
+use crate::opts::OutputFormat;
+
+pub fn process_csv(input: &str, output: &str, format: OutputFormat) -> anyhow::Result<()> {
     let mut reader = Reader::from_path(input)?;
 
     let headers = reader.headers()?.clone();
@@ -13,7 +15,10 @@ pub fn process_csv(input: &str, output: &str) -> anyhow::Result<()> {
         records.push(json_value);
     }
 
-    let json = serde_json::to_string_pretty(&records)?;
+    let json = match format {
+        OutputFormat::Json => serde_json::to_string_pretty(&records)?,
+        OutputFormat::Yaml => serde_yaml::to_string(&records)?,
+    };
     std::fs::write(output, json)?;
 
     Ok(())
