@@ -15,7 +15,9 @@ fn main() -> anyhow::Result<()> {
             process_csv(&opts.input, &output, opts.format)?
         }
         SubCommand::GenPass(opts) => {
-            if opts.no_uppercase && opts.no_lowercase && opts.no_number && opts.no_symbol {
+            if opts.length < 4 {
+                println!("password too short");
+            } else if opts.no_uppercase && opts.no_lowercase && opts.no_number && opts.no_symbol {
                 println!("invalid options");
             } else {
                 process_genpass(
